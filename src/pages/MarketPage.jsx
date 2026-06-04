@@ -116,8 +116,8 @@ const s = {
     fontSize: 16, color: active ? '#F0A500' : 'var(--border)',
     background: 'none', border: 'none', cursor: 'pointer', padding: '0 4px', flexShrink: 0,
   }),
-  levBadge: { display: 'inline-block', fontSize: 10, fontWeight: 700, padding: '1px 4px', borderRadius: 4, background: '#FFF0D0', color: '#E67E00', marginLeft: 4 },
-  liquidated: { display: 'inline-block', fontSize: 10, fontWeight: 700, padding: '1px 4px', borderRadius: 4, background: '#FFE0E0', color: 'var(--up)', marginLeft: 4 },
+  levBadge: { display: 'inline-block', fontSize: 10, fontWeight: 700, padding: '1px 4px', borderRadius: 4, background: 'rgba(230,126,0,0.15)', color: '#E67E00', marginLeft: 4 },
+  liquidated: { display: 'inline-block', fontSize: 10, fontWeight: 700, padding: '1px 4px', borderRadius: 4, background: 'rgba(240,68,82,0.15)', color: 'var(--up)', marginLeft: 4 },
 };
 
 export default function MarketPage() {
@@ -209,7 +209,7 @@ export default function MarketPage() {
         {['전체', ...(leverageUnlocked ? ['레버리지'] : []), ...SECTOR_LIST].map(sec => (
           <button key={sec} style={{
             ...s.sectorChip(sector === sec),
-            ...(sec === '레버리지' ? { background: sector === '레버리지' ? '#E67E00' : '#FFF0D0', color: sector === '레버리지' ? '#fff' : '#E67E00', border: '1px solid #E67E00' } : {}),
+            ...(sec === '레버리지' ? { background: sector === '레버리지' ? '#E67E00' : 'rgba(230,126,0,0.12)', color: sector === '레버리지' ? '#fff' : '#E67E00', border: '1px solid #E67E00' } : {}),
           }} onClick={() => setSector(sec)}>{sec === '레버리지' ? '⚡ 레버리지' : sec}</button>
         ))}
       </div>

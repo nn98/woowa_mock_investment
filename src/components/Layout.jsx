@@ -14,7 +14,7 @@ const s = {
   logo: { fontWeight: 700, fontSize: 17, color: 'var(--accent)', cursor: 'pointer' },
   statusBadge: (status) => ({
     fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 20,
-    background: status === 'running' ? '#E8F8F0' : status === 'paused' ? '#FFF3CD' : 'var(--bg)',
+    background: status === 'running' ? 'rgba(39,174,96,0.12)' : status === 'paused' ? 'rgba(240,165,0,0.12)' : 'var(--bg)',
     color: status === 'running' ? '#27AE60' : status === 'paused' ? '#F0A500' : 'var(--text3)',
   }),
   main: { flex: 1, overflowY: 'auto', paddingBottom: 72, contain: 'paint' },

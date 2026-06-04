@@ -3,10 +3,10 @@ import { useGameStore } from '../store/useGameStore';
 import { getEventsForDay } from '../data/newsEvents';
 
 export const TYPE_STYLE = {
-  hint:     { bg: '#EAF2FE', border: '#3182F6', color: '#1A5CB0', icon: '📡', label: '기대' },
-  realized: { bg: '#E8F8F0', border: '#27AE60', color: '#166534', icon: '✅', label: '실현' },
-  fake:     { bg: '#FFF3CD', border: '#F0A500', color: '#7C4700', icon: '⚠️', label: '실패' },
-  info:     { bg: '#F3F4F6', border: '#9CA3AF', color: '#374151', icon: '📰', label: '소식' },
+  hint:     { bg: 'rgba(49,130,246,0.12)',  border: '#3182F6', color: '#3182F6', icon: '📡', label: '기대' },
+  realized: { bg: 'rgba(39,174,96,0.12)',   border: '#27AE60', color: '#27AE60', icon: '✅', label: '실현' },
+  fake:     { bg: 'rgba(240,165,0,0.12)',   border: '#F0A500', color: '#F0A500', icon: '⚠️', label: '실패' },
+  info:     { bg: 'rgba(107,114,128,0.12)', border: '#9CA3AF', color: 'var(--text2)', icon: '📰', label: '소식' },
 };
 
 // Manages news queue and populates newsLog — rendered in Layout
@@ -56,9 +56,9 @@ export default function NewsToast({ queue, setQueue }) {
       style={{
         position: 'fixed', top: 68, left: '50%', transform: 'translateX(-50%)',
         width: 'calc(100% - 32px)', maxWidth: 448, zIndex: 500,
-        background: st.bg, border: `1.5px solid ${st.border}`, borderRadius: 14,
+        background: 'var(--surface)', border: `1.5px solid ${st.border}`, borderRadius: 14,
         padding: '12px 16px', cursor: 'pointer',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
         animation: 'slideDown 0.3s ease-out',
       }}
     >

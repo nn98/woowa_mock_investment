@@ -36,7 +36,7 @@ const s = {
     display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 1,
     background: 'var(--border)', margin: '16px 0',
   },
-  statItem: { background: '#fff', padding: '12px 16px' },
+  statItem: { background: 'var(--surface)', padding: '12px 16px' },
   statLabel: { fontSize: 11, color: 'var(--text3)', marginBottom: 4 },
   statVal: { fontSize: 14, fontWeight: 600 },
   holdingBox: {
@@ -49,7 +49,7 @@ const s = {
   orderPanel: {
     position: 'fixed', bottom: 72, left: '50%', transform: 'translateX(-50%)',
     width: '100%', maxWidth: 480,
-    background: '#fff', borderTop: '1px solid var(--border)',
+    background: 'var(--surface)', borderTop: '1px solid var(--border)',
     padding: '10px 16px 12px',
   },
   tabs: { display: 'flex', gap: 6, marginBottom: 10 },
@@ -61,7 +61,7 @@ const s = {
   qtyRow: { display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 },
   qtyBtn: {
     width: 36, height: 36, borderRadius: 8, border: '1px solid var(--border)',
-    fontSize: 18, fontWeight: 700, background: '#fff', cursor: 'pointer',
+    fontSize: 18, fontWeight: 700, background: 'var(--surface)', cursor: 'pointer',
     display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
   },
   qtyInput: {
@@ -90,7 +90,7 @@ const CustomTooltip = ({ active, payload }) => {
   if (!d) return null;
   const isUp = d.close >= d.open;
   return (
-    <div style={{ background: '#fff', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 12px', fontSize: 12 }}>
+    <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 12px', fontSize: 12 }}>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px 12px' }}>
         <span style={{ color: 'var(--text3)' }}>시가</span><span style={{ fontWeight: 600 }}>{fmt(d.open)}원</span>
         <span style={{ color: 'var(--text3)' }}>종가</span><span style={{ fontWeight: 700, color: isUp ? 'var(--up)' : 'var(--down)' }}>{fmt(d.close)}원</span>
@@ -179,7 +179,7 @@ export default function StockDetailPage() {
         <div style={{ flex: 1 }}>
           <div style={s.name}>
             {stock.name}
-            {stock.isLeveraged && <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: isLiquidated ? '#FFE0E0' : '#FFF0D0', color: isLiquidated ? 'var(--up)' : '#E67E00' }}>{isLiquidated ? '청산' : '2X'}</span>}
+            {stock.isLeveraged && <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: isLiquidated ? 'rgba(240,68,82,0.15)' : 'rgba(230,126,0,0.15)', color: isLiquidated ? 'var(--up)' : '#E67E00' }}>{isLiquidated ? '청산' : '2X'}</span>}
           </div>
           <div style={s.code}>{code} · {SECTOR_KO[stock.sector] ?? stock.sector}</div>
         </div>

@@ -58,7 +58,7 @@ const s = {
   },
   qtyBtn: {
     width: 32, height: 32, borderRadius: 8, border: '1px solid var(--border)',
-    fontSize: 16, fontWeight: 700, background: '#fff', cursor: 'pointer', flexShrink: 0,
+    fontSize: 16, fontWeight: 700, background: 'var(--surface)', cursor: 'pointer', flexShrink: 0,
     display: 'flex', alignItems: 'center', justifyContent: 'center',
   },
   qtyInput: {

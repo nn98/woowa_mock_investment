@@ -9,7 +9,7 @@ const s = {
     display: 'flex', alignItems: 'flex-end', zIndex: 200,
   },
   sheet: {
-    background: '#fff', width: '100%', maxWidth: 480, margin: '0 auto',
+    background: 'var(--surface)', width: '100%', maxWidth: 480, margin: '0 auto',
     borderRadius: '20px 20px 0 0', padding: 24, paddingBottom: 'max(24px, env(safe-area-inset-bottom))',
   },
   title: { fontSize: 18, fontWeight: 700, marginBottom: 4 },

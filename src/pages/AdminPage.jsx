@@ -35,7 +35,7 @@ function useCountdown(game) {
 const s = {
   wrap: { padding: 20, maxWidth: 480, margin: '0 auto', paddingBottom: 100 },
   topBar: {
-    position: 'sticky', top: 0, zIndex: 10, background: '#fff',
+    position: 'sticky', top: 0, zIndex: 10, background: 'var(--surface)',
     borderBottom: '1px solid var(--border)', padding: '12px 20px',
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
     margin: '-20px -20px 20px',
@@ -43,12 +43,12 @@ const s = {
   topLogo: { fontWeight: 700, fontSize: 18, color: 'var(--accent)' },
   title: { fontSize: 20, fontWeight: 700, marginBottom: 4 },
   sub: { fontSize: 13, color: 'var(--text2)', marginBottom: 24 },
-  card: { background: '#fff', border: '1px solid var(--border)', borderRadius: 14, padding: 16, marginBottom: 16 },
+  card: { background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, padding: 16, marginBottom: 16 },
   cardTitle: { fontSize: 14, fontWeight: 700, color: 'var(--text2)', marginBottom: 12 },
   statusRow: { display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 },
   badge: (s) => ({
     padding: '3px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600,
-    background: s === 'running' ? '#E8F8F0' : s === 'paused' ? '#FFF3CD' : '#F0F0F0',
+    background: s === 'running' ? 'rgba(39,174,96,0.12)' : s === 'paused' ? 'rgba(240,165,0,0.12)' : 'var(--bg)',
     color: s === 'running' ? '#27AE60' : s === 'paused' ? '#E67E00' : 'var(--text3)',
   }),
   infoGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 12 },
@@ -68,10 +68,11 @@ const s = {
   pwdInput: {
     width: '100%', height: 46, borderRadius: 10, border: '1px solid var(--border)',
     padding: '0 14px', fontSize: 15, outline: 'none', marginBottom: 12,
+    background: 'var(--surface)', color: 'var(--text1)',
   },
   select: {
     width: '100%', height: 46, borderRadius: 10, border: '1px solid var(--border)',
-    padding: '0 14px', fontSize: 15, outline: 'none', marginBottom: 12, background: '#fff',
+    padding: '0 14px', fontSize: 15, outline: 'none', marginBottom: 12, background: 'var(--surface)', color: 'var(--text1)',
   },
   err: { color: 'var(--up)', fontSize: 13, marginBottom: 8 },
   progressBar: (pct) => ({
@@ -128,7 +129,7 @@ function BottomNav() {
   return (
     <nav style={{
       position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)',
-      width: '100%', maxWidth: 480, background: '#fff', borderTop: '1px solid var(--border)',
+      width: '100%', maxWidth: 480, background: 'var(--surface)', borderTop: '1px solid var(--border)',
       display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr',
       padding: '8px 0 max(8px, env(safe-area-inset-bottom))', zIndex: 100,
     }}>

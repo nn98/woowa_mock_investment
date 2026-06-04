@@ -16,7 +16,7 @@ function NewsItem({ item }) {
   const st = TYPE_STYLE[item.type] ?? TYPE_STYLE.info;
   return (
     <div style={{
-      background: st.bg, border: `1px solid ${st.border}`, borderRadius: 10,
+      background: 'var(--surface)', border: `1.5px solid ${st.border}`, borderRadius: 10,
       padding: '10px 12px', marginBottom: 8,
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
@@ -82,7 +82,7 @@ export default function NewsSidebar({ mobileOpen, onMobileClose }) {
     >
       <div style={{
         width: 300, maxWidth: '85vw', height: '100%',
-        background: 'var(--surface)', borderRight: '1px solid var(--border)',
+        background: 'var(--surface)', borderRight: '1.5px solid var(--border)',
         padding: '56px 16px 16px',
         overflowY: 'auto',
         animation: 'slideInLeft 0.25s ease-out',
