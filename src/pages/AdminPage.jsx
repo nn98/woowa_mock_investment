@@ -85,9 +85,18 @@ const s = {
 
 const STATUS_KO = { waiting: '대기중', running: '진행중', paused: '일시정지', finished: '종료' };
 
+const NAV_ITEMS = [
+  { to: '/', icon: '📊', label: '시장' },
+  { to: '/portfolio', icon: '💼', label: '내 주식' },
+  { to: '/stats', icon: '📈', label: '분석' },
+  { to: '/rankings', icon: '🏆', label: '순위' },
+  { to: '/admin', icon: '⚙️', label: '관리' },
+];
+
 function TopBar({ onBack, onLogout, game }) {
   const remaining = useCountdown(game);
   const urgent = remaining !== null && remaining <= 10;
+  const { darkMode, toggleDarkMode } = useGameStore();
   return (
     <div style={s.topBar}>
       <span style={s.topLogo}>📈 우아한 모의투자</span>
@@ -104,6 +113,9 @@ function TopBar({ onBack, onLogout, game }) {
             </span>
           </div>
         )}
+        <button onClick={toggleDarkMode} style={{ fontSize: 18, background: 'none', border: 'none', cursor: 'pointer', padding: 2 }}>
+          {darkMode ? '☀️' : '🌙'}
+        </button>
         {onLogout && (
           <button onClick={onLogout} style={{
             height: 32, padding: '0 12px', borderRadius: 8, border: '1.5px solid var(--up)',
@@ -121,8 +133,8 @@ function TopBar({ onBack, onLogout, game }) {
 
 function BottomNav() {
   const navStyle = (active) => ({
-    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
-    padding: '4px 0', fontSize: 11, fontWeight: active ? 600 : 400,
+    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+    padding: '4px 0', fontSize: 10, fontWeight: active ? 600 : 400,
     color: active ? 'var(--accent)' : 'var(--text3)',
     textDecoration: 'none', transition: 'color .15s',
   });
@@ -130,23 +142,15 @@ function BottomNav() {
     <nav style={{
       position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)',
       width: '100%', maxWidth: 480, background: 'var(--surface)', borderTop: '1px solid var(--border)',
-      display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr',
-      padding: '8px 0 max(8px, env(safe-area-inset-bottom))', zIndex: 100,
+      display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
+      padding: '6px 0 max(6px, env(safe-area-inset-bottom))', zIndex: 100,
     }}>
-      {[
-        { to: '/', icon: '📊', label: '시장' },
-        { to: '/portfolio', icon: '💼', label: '내 주식' },
-        { to: '/rankings', icon: '🏆', label: '순위' },
-      ].map(({ to, icon, label }) => (
-        <NavLink key={to} to={to} end style={({ isActive }) => navStyle(isActive)}>
-          <span style={{ fontSize: 20 }}>{icon}</span>
+      {NAV_ITEMS.map(({ to, icon, label }) => (
+        <NavLink key={to} to={to} end={to === '/'} style={({ isActive }) => navStyle(isActive)}>
+          <span style={{ fontSize: 19 }}>{icon}</span>
           <span>{label}</span>
         </NavLink>
       ))}
-      <NavLink to="/admin" style={({ isActive }) => navStyle(isActive)}>
-        <span style={{ fontSize: 20 }}>⚙️</span>
-        <span>관리</span>
-      </NavLink>
     </nav>
   );
 }
@@ -157,7 +161,12 @@ export default function AdminPage() {
   const [auth, setAuth] = useState(false);
   const [speed, setSpeed] = useState(8);
   const [msg, setMsg] = useState('');
-  const { game, currentDayIndex, logout, user } = useGameStore();
+  const { game, currentDayIndex, logout, user, darkMode } = useGameStore();
+
+  // Apply dark mode class (Layout doesn't wrap AdminPage)
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', darkMode);
+  }, [darkMode]);
 
   // sync speed dropdown with actual game speed
   useEffect(() => {
