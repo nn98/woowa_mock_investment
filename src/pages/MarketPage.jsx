@@ -12,9 +12,9 @@ if (typeof document !== 'undefined' && !document.getElementById('mkt-anim')) {
   document.head.appendChild(st);
 }
 
-const ALL_STOCKS = [...STOCK_DATA, ...LEVERAGED_DATA];
+const LEVERAGE_UNLOCK_DAY = 20;
 const SORTS = ['등락률', '현재가', '이름'];
-const SECTOR_LIST = [...new Set(ALL_STOCKS.map(s => SECTOR_KO[s.sector] ?? s.sector))].sort();
+const SECTOR_LIST = [...new Set(STOCK_DATA.map(s => SECTOR_KO[s.sector] ?? s.sector))].sort();
 
 const PRICE_FACTOR = 0.85;
 
@@ -136,19 +136,23 @@ export default function MarketPage() {
     }
   }, [currentDayIndex]);
 
+  const leverageUnlocked = currentDayIndex >= LEVERAGE_UNLOCK_DAY;
+  const allStocks = leverageUnlocked ? [...STOCK_DATA, ...LEVERAGED_DATA] : STOCK_DATA;
+
   const items = useMemo(() => {
-    return ALL_STOCKS.map(stock => {
+    return allStocks.map(stock => {
       const price = getCurrentPrice(stock.code);
       const prevPrice = getPrevPrice(stock.code);
       const chg = prevPrice > 0 ? ((price - prevPrice) / prevPrice) * 100 : 0;
       return { ...stock, price, chg, isLiquidated: stock.isLeveraged && price === 0 };
     });
-  }, [currentDayIndex]);
+  }, [currentDayIndex, leverageUnlocked]);
 
   const filtered = useMemo(() => {
     let arr = items;
     if (query) arr = arr.filter(s => s.name.includes(query) || s.code.includes(query));
-    if (sector !== '전체') arr = arr.filter(s => (SECTOR_KO[s.sector] ?? s.sector) === sector);
+    if (sector === '레버리지') arr = arr.filter(s => s.isLeveraged);
+    else if (sector !== '전체') arr = arr.filter(s => !s.isLeveraged && (SECTOR_KO[s.sector] ?? s.sector) === sector);
     if (sort === '등락률') arr = [...arr].sort((a, b) => b.chg - a.chg);
     else if (sort === '현재가') arr = [...arr].sort((a, b) => b.price - a.price);
     else arr = [...arr].sort((a, b) => a.name.localeCompare(b.name));
@@ -202,8 +206,11 @@ export default function MarketPage() {
       </div>
 
       <div style={s.sectorRow}>
-        {['전체', ...SECTOR_LIST].map(sec => (
-          <button key={sec} style={s.sectorChip(sector === sec)} onClick={() => setSector(sec)}>{sec}</button>
+        {['전체', ...(leverageUnlocked ? ['레버리지'] : []), ...SECTOR_LIST].map(sec => (
+          <button key={sec} style={{
+            ...s.sectorChip(sector === sec),
+            ...(sec === '레버리지' ? { background: sector === '레버리지' ? '#E67E00' : '#FFF0D0', color: sector === '레버리지' ? '#fff' : '#E67E00', border: '1px solid #E67E00' } : {}),
+          }} onClick={() => setSector(sec)}>{sec === '레버리지' ? '⚡ 레버리지' : sec}</button>
         ))}
       </div>
 
