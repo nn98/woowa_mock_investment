@@ -1,7 +1,8 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useGameStore, TRADING_DAYS } from '../store/useGameStore';
-import NewsToast from './NewsToast';
+import NewsToast, { useNewsQueue } from './NewsToast';
+import NewsSidebar from './NewsSidebar';
 
 const s = {
   wrap: { display: 'flex', flexDirection: 'column', minHeight: '100dvh' },
@@ -50,34 +51,64 @@ function useCountdown(game) {
   return remaining;
 }
 
+const NAV_ITEMS = [
+  { to: '/', icon: '📊', label: '시장' },
+  { to: '/portfolio', icon: '💼', label: '내 주식' },
+  { to: '/stats', icon: '📈', label: '분석' },
+  { to: '/rankings', icon: '🏆', label: '순위' },
+  { to: '/admin', icon: '⚙️', label: '관리' },
+];
+
 export default function Layout() {
   const navigate = useNavigate();
-  const { game, currentDayIndex, darkMode, toggleDarkMode } = useGameStore();
+  const { game, currentDayIndex, darkMode, toggleDarkMode, newsLog } = useGameStore();
   const status = game?.status ?? 'waiting';
   const progress = game ? Math.round((currentDayIndex / (game.totalDays - 1)) * 100) : 0;
   const remaining = useCountdown(game);
   const urgent = remaining !== null && remaining <= 10;
+  const { queue, setQueue } = useNewsQueue();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(() => window.innerWidth >= 960);
+  const [hasUnread, setHasUnread] = useState(false);
 
-  // Apply dark mode class on mount
+  useEffect(() => {
+    const fn = () => setIsDesktop(window.innerWidth >= 960);
+    window.addEventListener('resize', fn);
+    return () => window.removeEventListener('resize', fn);
+  }, []);
+
+  // Mark unread dot when new news arrives on mobile
+  useEffect(() => {
+    if (!isDesktop && newsLog.length > 0) setHasUnread(true);
+  }, [newsLog.length, isDesktop]);
+
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode);
   }, [darkMode]);
 
-  const NAV_ITEMS = [
-    { to: '/', icon: '📊', label: '시장' },
-    { to: '/portfolio', icon: '💼', label: '내 주식' },
-    { to: '/stats', icon: '📈', label: '분석' },
-    { to: '/rankings', icon: '🏆', label: '순위' },
-    { to: '/admin', icon: '⚙️', label: '관리' },
-  ];
-
   return (
     <div style={s.wrap}>
       <header style={s.header}>
-        <span style={s.logo} onClick={() => navigate('/')}>📈 우아한 모의투자</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {/* Mobile news bell */}
+          {!isDesktop && (
+            <button
+              onClick={() => { setSidebarOpen(true); setHasUnread(false); }}
+              style={{ position: 'relative', fontSize: 20, background: 'none', border: 'none', cursor: 'pointer', padding: '0 2px' }}
+            >
+              🔔
+              {hasUnread && (
+                <span style={{
+                  position: 'absolute', top: 0, right: 0, width: 8, height: 8,
+                  background: 'var(--up)', borderRadius: '50%', border: '1.5px solid var(--surface)',
+                }} />
+              )}
+            </button>
+          )}
+          <span style={s.logo} onClick={() => navigate('/')}>📈 우아한 모의투자</span>
+        </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          {/* Countdown or status */}
           {remaining !== null ? (
             <div style={{
               background: urgent ? 'var(--up)' : 'var(--text1)',
@@ -94,23 +125,13 @@ export default function Layout() {
           ) : (
             <span style={s.statusBadge(status)}>{STATUS_LABEL[status]}</span>
           )}
-
-          {/* Progress % */}
-          {game && (
-            <span style={{ fontSize: 11, color: 'var(--text3)' }}>{progress}%</span>
-          )}
-
-          {/* Dark mode toggle */}
-          <button
-            onClick={toggleDarkMode}
-            style={{ fontSize: 18, background: 'none', border: 'none', cursor: 'pointer', padding: 2 }}
-          >
+          {game && <span style={{ fontSize: 11, color: 'var(--text3)' }}>{progress}%</span>}
+          <button onClick={toggleDarkMode} style={{ fontSize: 18, background: 'none', border: 'none', cursor: 'pointer', padding: 2 }}>
             {darkMode ? '☀️' : '🌙'}
           </button>
         </div>
       </header>
 
-      {/* Progress bar */}
       <div style={{ height: 2, background: 'var(--border)' }}>
         <div style={{ height: '100%', width: `${progress}%`, background: 'var(--accent)', transition: 'width 1s linear' }} />
       </div>
@@ -119,8 +140,16 @@ export default function Layout() {
         <Outlet />
       </main>
 
-      {/* News toast */}
-      <NewsToast />
+      {/* Desktop sidebar (always visible) */}
+      {isDesktop && <NewsSidebar />}
+
+      {/* Mobile sidebar (toggle) */}
+      {!isDesktop && (
+        <>
+          <NewsToast queue={queue} setQueue={setQueue} />
+          <NewsSidebar mobileOpen={sidebarOpen} onMobileClose={() => setSidebarOpen(false)} />
+        </>
+      )}
 
       <nav style={s.nav}>
         {NAV_ITEMS.map(({ to, icon, label }) => (

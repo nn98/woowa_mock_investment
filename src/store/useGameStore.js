@@ -35,6 +35,9 @@ export const useGameStore = create(
       // Onboarding seen
       onboardingDone: false,
 
+      // News log (in-memory only, not persisted)
+      newsLog: [],
+
       setUser: (user) => set({ user }),
       setGame: (game) => set({ game }),
       setPortfolio: (portfolio) => set({ portfolio }),
@@ -56,6 +59,10 @@ export const useGameStore = create(
       },
 
       setOnboardingDone: () => set({ onboardingDone: true }),
+
+      addNewsItem: (item) => set(state => ({
+        newsLog: [item, ...state.newsLog].slice(0, 60),
+      })),
 
       recordValueSnapshot: (day, value) => set(state => {
         const h = state.valueHistory;

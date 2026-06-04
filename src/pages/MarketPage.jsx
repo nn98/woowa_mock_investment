@@ -193,6 +193,8 @@ export default function MarketPage() {
       {/* 5-day sector bar */}
       <SectorBar dayIndex={currentDayIndex} />
 
+      <div style={{ height: 10 }} />
+
       <div style={s.search}>
         <span style={{ fontSize: 16 }}>🔍</span>
         <input style={s.searchInput} placeholder="종목명 검색" value={query} onChange={e => setQuery(e.target.value)} />
