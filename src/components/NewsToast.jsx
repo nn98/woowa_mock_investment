@@ -13,7 +13,8 @@ export const TYPE_STYLE = {
 export function useNewsQueue() {
   const { currentDayIndex, addNewsItem } = useGameStore();
   const [queue, setQueue] = useState([]);
-  const prevDayRef = useRef(-1);
+  // Initialize to currentDayIndex so remounts don't re-fire past events
+  const prevDayRef = useRef(currentDayIndex);
 
   useEffect(() => {
     if (currentDayIndex === prevDayRef.current) return;

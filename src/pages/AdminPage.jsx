@@ -36,11 +36,11 @@ const s = {
   wrap: { padding: 20, maxWidth: 480, margin: '0 auto', paddingBottom: 100 },
   topBar: {
     position: 'sticky', top: 0, zIndex: 10, background: 'var(--surface)',
-    borderBottom: '1px solid var(--border)', padding: '12px 20px',
+    borderBottom: '1px solid var(--border)', padding: '10px 16px',
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
     margin: '-20px -20px 20px',
   },
-  topLogo: { fontWeight: 700, fontSize: 18, color: 'var(--accent)' },
+  topLogo: { fontWeight: 700, fontSize: 17, color: 'var(--accent)', cursor: 'default' },
   title: { fontSize: 20, fontWeight: 700, marginBottom: 4 },
   sub: { fontSize: 13, color: 'var(--text2)', marginBottom: 24 },
   card: { background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, padding: 16, marginBottom: 16 },

@@ -5,7 +5,7 @@ const MEDALS = ['🥇', '🥈', '🥉'];
 
 const s = {
   wrap: { padding: '0' },
-  title: { fontSize: 17, fontWeight: 700, padding: '0 16px 16px' },
+  title: { fontSize: 17, fontWeight: 700, padding: '16px 16px 12px' },
   item: (isMe, rank) => ({
     display: 'flex', alignItems: 'center', padding: '14px 16px', gap: 12,
     background: isMe ? 'var(--accent-light)' : rank <= 3 ? 'var(--bg)' : 'var(--surface)',
