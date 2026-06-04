@@ -10,6 +10,7 @@ import { fmt } from '../components/PriceChange';
 const ADMIN_PWD = import.meta.env.VITE_ADMIN_PASSWORD || 'admin1234';
 const TOTAL_DAYS = TRADING_DAYS.length;
 const SPEED_OPTIONS = [
+  { label: '아주느리게 (15초/일)', val: 15 },
   { label: '느리게 (12초/일)', val: 12 },
   { label: '보통 (8초/일)', val: 8 },
   { label: '빠르게 (5초/일)', val: 5 },
@@ -156,6 +157,11 @@ export default function AdminPage() {
   const [speed, setSpeed] = useState(8);
   const [msg, setMsg] = useState('');
   const { game, currentDayIndex, logout, user } = useGameStore();
+
+  // sync speed dropdown with actual game speed
+  useEffect(() => {
+    if (game?.secondsPerDay) setSpeed(game.secondsPerDay);
+  }, [game?.secondsPerDay]);
 
   function handleLogout() {
     logout();

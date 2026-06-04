@@ -12,12 +12,19 @@ import Layout from './components/Layout';
 
 function GameSync() {
   const { user, game, setGame, setPortfolio, setAllPortfolios,
-          setCurrentDayIndex, computeDayIndex, computeTotalValue } = useGameStore();
+          setCurrentDayIndex, computeDayIndex, computeTotalValue, logout } = useGameStore();
   const tickRef = useRef(null);
+  const resetTokenRef = useRef(null);
 
-  // Subscribe to game state
+  // Subscribe to game state — detect reset
   useEffect(() => {
-    const unsub = subscribeGame(setGame);
+    const unsub = subscribeGame((g) => {
+      setGame(g);
+      if (g?.resetToken && resetTokenRef.current !== null && g.resetToken !== resetTokenRef.current) {
+        logout();
+      }
+      if (g?.resetToken) resetTokenRef.current = g.resetToken;
+    });
     return unsub;
   }, []);
 

@@ -71,6 +71,7 @@ export async function setGameSpeed(secondsPerDay, currentDayIndex) {
 }
 
 export async function resetGame(totalDays, secondsPerDay = 8) {
+  const resetToken = Date.now();
   await setDoc(doc(db, 'games', GAME_ID), {
     status: 'waiting',
     currentDayIndex: 0,
@@ -79,6 +80,7 @@ export async function resetGame(totalDays, secondsPerDay = 8) {
     startedAt: null,
     pausedAt: null,
     pausedDayIndex: 0,
+    resetToken,
     createdAt: serverTimestamp(),
   });
   // Reset all portfolios
