@@ -41,6 +41,9 @@ body { background: var(--bg); color: var(--text1); min-height: 100dvh; }
 
 #root { max-width: 480px; margin: 0 auto; min-height: 100dvh; position: relative; background: var(--surface); }
 
+/* Prevent layout shift when scrollbar appears/disappears */
+.main-scroll { scrollbar-gutter: stable; }
+
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }

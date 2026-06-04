@@ -19,9 +19,9 @@ if (typeof document !== 'undefined' && !document.getElementById('pf-anim')) {
 }
 
 const s = {
-  wrap: { padding: 16 },
+  wrap: { padding: '0 16px 16px' },
   totalBox: {
-    background: 'var(--text1)', color: '#fff', borderRadius: 14, padding: '20px 20px', marginBottom: 16,
+    background: 'var(--text1)', color: '#fff', borderRadius: 14, padding: '20px 20px', marginBottom: 16, marginTop: 12,
   },
   totalLabel: { fontSize: 13, opacity: 0.6, marginBottom: 4 },
   totalVal: { fontSize: 32, fontWeight: 800, marginBottom: 8 },

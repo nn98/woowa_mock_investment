@@ -7,8 +7,9 @@ import {
 } from 'recharts';
 
 const s = {
-  wrap: { padding: 16 },
-  section: { marginBottom: 20 },
+  wrap: { padding: '0 16px 16px' },
+  section: { marginBottom: 20, ':first-child': { marginTop: 12 } },
+  firstSection: { marginBottom: 20, marginTop: 12 },
   sectionTitle: { fontSize: 15, fontWeight: 700, marginBottom: 12 },
   card: {
     background: 'var(--bg)', borderRadius: 14, padding: '16px',
@@ -79,7 +80,7 @@ export default function StatsPage() {
   return (
     <div style={s.wrap}>
       {/* Portfolio chart */}
-      <div style={s.section}>
+      <div style={s.firstSection}>
         <div style={s.sectionTitle}>📈 자산 변화</div>
         {chartData.length < 2 ? (
           <div style={{ ...s.card, textAlign: 'center', color: 'var(--text3)', fontSize: 13, padding: '32px 16px' }}>

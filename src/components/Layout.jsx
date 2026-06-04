@@ -17,7 +17,7 @@ const s = {
     background: status === 'running' ? '#E8F8F0' : status === 'paused' ? '#FFF3CD' : 'var(--bg)',
     color: status === 'running' ? '#27AE60' : status === 'paused' ? '#F0A500' : 'var(--text3)',
   }),
-  main: { flex: 1, overflowY: 'auto', paddingBottom: 72 },
+  main: { flex: 1, overflowY: 'auto', paddingBottom: 72, contain: 'paint' },
   nav: {
     position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)',
     width: '100%', maxWidth: 480,
@@ -136,7 +136,7 @@ export default function Layout() {
         <div style={{ height: '100%', width: `${progress}%`, background: 'var(--accent)', transition: 'width 1s linear' }} />
       </div>
 
-      <main style={s.main}>
+      <main style={s.main} className="main-scroll">
         <Outlet />
       </main>
 

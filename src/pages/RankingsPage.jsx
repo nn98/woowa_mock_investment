@@ -4,7 +4,7 @@ import { fmt } from '../components/PriceChange';
 const MEDALS = ['🥇', '🥈', '🥉'];
 
 const s = {
-  wrap: { padding: '16px 0' },
+  wrap: { padding: '0' },
   title: { fontSize: 17, fontWeight: 700, padding: '0 16px 16px' },
   item: (isMe, rank) => ({
     display: 'flex', alignItems: 'center', padding: '14px 16px', gap: 12,

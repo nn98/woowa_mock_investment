@@ -78,7 +78,7 @@ function SectorBar({ dayIndex }) {
 }
 
 const s = {
-  wrap: { padding: '16px 0' },
+  wrap: { padding: '0' },
   search: {
     margin: '0 16px 12px', display: 'flex', alignItems: 'center', gap: 8,
     background: 'var(--bg)', borderRadius: 10, padding: '10px 14px',
@@ -108,7 +108,7 @@ const s = {
     fontSize: 12, fontWeight: 600, marginTop: 2,
     color: d > 0 ? 'var(--up)' : d < 0 ? 'var(--down)' : 'var(--neutral)',
   }),
-  summary: { padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', gap: 16 },
+  summary: { padding: '12px 16px 12px', borderBottom: '1px solid var(--border)', display: 'flex', gap: 16, marginTop: 12 },
   summaryItem: { flex: 1 },
   summaryLabel: { fontSize: 11, color: 'var(--text3)', marginBottom: 2 },
   summaryValue: { fontSize: 15, fontWeight: 700 },
