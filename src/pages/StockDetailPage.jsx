@@ -29,7 +29,7 @@ const s = {
   periodRow: { display: 'flex', gap: 4, padding: '0 16px 8px' },
   periodBtn: (active) => ({
     padding: '5px 12px', borderRadius: 20, fontSize: 13, fontWeight: active ? 600 : 400,
-    background: active ? 'var(--text1)' : 'var(--bg)', color: active ? '#fff' : 'var(--text2)',
+    background: active ? '#191F28' : 'var(--bg)', color: active ? '#fff' : 'var(--text2)',
     border: 'none', cursor: 'pointer',
   }),
   statsRow: {

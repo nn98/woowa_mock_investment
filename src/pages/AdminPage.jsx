@@ -94,7 +94,7 @@ function TopBar({ onBack, onLogout, game }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         {remaining !== null && (
           <div style={{
-            background: urgent ? 'var(--up)' : 'var(--text1)',
+            background: urgent ? 'var(--up)' : '#191F28',
             borderRadius: 8, padding: '3px 10px',
             display: 'flex', flexDirection: 'column', alignItems: 'flex-end',
           }}>
