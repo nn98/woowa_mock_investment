@@ -1,6 +1,7 @@
 import {
   doc, getDoc, setDoc, updateDoc, onSnapshot,
-  collection, getDocs, writeBatch, serverTimestamp, increment
+  collection, getDocs, writeBatch, serverTimestamp, increment,
+  query, where, orderBy, limit
 } from 'firebase/firestore';
 import { db } from './config';
 
@@ -159,4 +160,15 @@ export async function executeTrade({ userId, stockCode, stockName, type, quantit
 
 export async function updateTotalValue(userId, totalValue) {
   await updateDoc(doc(db, 'portfolios', userId), { totalValue, updatedAt: serverTimestamp() });
+}
+
+export async function getTransactions(userId, maxCount = 100) {
+  const q = query(
+    collection(db, 'transactions'),
+    where('userId', '==', userId),
+    orderBy('timestamp', 'desc'),
+    limit(maxCount)
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }

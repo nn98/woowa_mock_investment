@@ -23,12 +23,45 @@ export const useGameStore = create(
       allPortfolios: [],
       currentDayIndex: 0,
 
+      // Favorites: Set serialized as array
+      favorites: [],
+
+      // Dark mode
+      darkMode: false,
+
+      // Portfolio value history: [{day, value}]
+      valueHistory: [],
+
+      // Onboarding seen
+      onboardingDone: false,
+
       setUser: (user) => set({ user }),
       setGame: (game) => set({ game }),
       setPortfolio: (portfolio) => set({ portfolio }),
       setAllPortfolios: (all) => set({ allPortfolios: all }),
       setCurrentDayIndex: (i) => set({ currentDayIndex: i }),
-      logout: () => set({ user: null, portfolio: null }),
+      logout: () => set({ user: null, portfolio: null, valueHistory: [] }),
+
+      toggleFavorite: (code) => set(state => {
+        const favs = state.favorites.includes(code)
+          ? state.favorites.filter(c => c !== code)
+          : [...state.favorites, code];
+        return { favorites: favs };
+      }),
+
+      toggleDarkMode: () => {
+        const next = !get().darkMode;
+        document.documentElement.classList.toggle('dark', next);
+        set({ darkMode: next });
+      },
+
+      setOnboardingDone: () => set({ onboardingDone: true }),
+
+      recordValueSnapshot: (day, value) => set(state => {
+        const h = state.valueHistory;
+        if (h.length > 0 && h[h.length - 1].day === day) return state;
+        return { valueHistory: [...h, { day, value }] };
+      }),
 
       getCurrentPrice: (code) => {
         const prices = getRawPrices(code);
@@ -41,8 +74,7 @@ export const useGameStore = create(
         const prices = getRawPrices(code);
         if (!prices) return 0;
         const dayIdx = Math.min(get().currentDayIndex, TRADING_DAYS.length - 1);
-        const prevIdx = Math.max(0, dayIdx - 1);
-        return Math.round((prices[prevIdx] ?? 0) * PRICE_FACTOR);
+        return Math.round((prices[Math.max(0, dayIdx - 1)] ?? 0) * PRICE_FACTOR);
       },
 
       getStockPriceHistory: (code) => {
@@ -72,7 +104,13 @@ export const useGameStore = create(
     }),
     {
       name: 'woowa-session',
-      partialize: (state) => ({ user: state.user }),
+      partialize: (state) => ({
+        user: state.user,
+        favorites: state.favorites,
+        darkMode: state.darkMode,
+        valueHistory: state.valueHistory,
+        onboardingDone: state.onboardingDone,
+      }),
     }
   )
 );

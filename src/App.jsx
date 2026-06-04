@@ -8,15 +8,19 @@ import StockDetailPage from './pages/StockDetailPage';
 import PortfolioPage from './pages/PortfolioPage';
 import RankingsPage from './pages/RankingsPage';
 import AdminPage from './pages/AdminPage';
+import StatsPage from './pages/StatsPage';
 import Layout from './components/Layout';
+import OnboardingTutorial from './components/OnboardingTutorial';
 
 function GameSync() {
-  const { user, game, setGame, setPortfolio, setAllPortfolios,
-          setCurrentDayIndex, computeDayIndex, computeTotalValue, logout } = useGameStore();
+  const {
+    user, game, setGame, setPortfolio, setAllPortfolios,
+    setCurrentDayIndex, computeDayIndex, computeTotalValue,
+    logout, recordValueSnapshot,
+  } = useGameStore();
   const tickRef = useRef(null);
   const resetTokenRef = useRef(null);
 
-  // Subscribe to game state — detect reset
   useEffect(() => {
     const unsub = subscribeGame((g) => {
       setGame(g);
@@ -28,20 +32,17 @@ function GameSync() {
     return unsub;
   }, []);
 
-  // Subscribe to portfolio
   useEffect(() => {
     if (!user) return;
     const unsub = subscribePortfolio(user.userId, setPortfolio);
     return unsub;
   }, [user?.userId]);
 
-  // Subscribe to all portfolios for leaderboard
   useEffect(() => {
     const unsub = subscribeAllPortfolios(setAllPortfolios);
     return unsub;
   }, []);
 
-  // Tick: update day index every second
   useEffect(() => {
     if (tickRef.current) clearInterval(tickRef.current);
     tickRef.current = setInterval(() => {
@@ -51,15 +52,23 @@ function GameSync() {
     return () => clearInterval(tickRef.current);
   }, [game]);
 
-  // Sync total value to Firestore every 10s
+  // Sync total value + record snapshot
   const syncRef = useRef(null);
+  const lastSnapshotDay = useRef(-1);
   useEffect(() => {
     if (!user) return;
     if (syncRef.current) clearInterval(syncRef.current);
     syncRef.current = setInterval(() => {
+      const { currentDayIndex } = useGameStore.getState();
       const total = computeTotalValue();
-      if (total > 0) updateTotalValue(user.userId, total).catch(() => {});
-    }, 10000);
+      if (total > 0) {
+        updateTotalValue(user.userId, total).catch(() => {});
+        if (currentDayIndex !== lastSnapshotDay.current) {
+          recordValueSnapshot(currentDayIndex, total);
+          lastSnapshotDay.current = currentDayIndex;
+        }
+      }
+    }, 5000);
     return () => clearInterval(syncRef.current);
   }, [user?.userId, game]);
 
@@ -78,10 +87,17 @@ function RedirectIfAuth({ children }) {
   return children;
 }
 
+function OnboardingGate() {
+  const { onboardingDone, user } = useGameStore();
+  if (user && !onboardingDone) return <OnboardingTutorial />;
+  return null;
+}
+
 export default function App() {
   return (
     <>
       <GameSync />
+      <OnboardingGate />
       <Routes>
         <Route path="/login" element={<RedirectIfAuth><LoginPage /></RedirectIfAuth>} />
         <Route path="/admin" element={<AdminPage />} />
@@ -89,6 +105,7 @@ export default function App() {
           <Route path="/" element={<MarketPage />} />
           <Route path="/stock/:code" element={<StockDetailPage />} />
           <Route path="/portfolio" element={<PortfolioPage />} />
+          <Route path="/stats" element={<StatsPage />} />
           <Route path="/rankings" element={<RankingsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

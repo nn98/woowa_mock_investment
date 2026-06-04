@@ -21,16 +21,30 @@
   -webkit-font-smoothing: antialiased;
 }
 
+/* Dark mode */
+html.dark {
+  --bg: #0F1117;
+  --surface: #1C1F26;
+  --border: #2C303A;
+  --text1: #F1F3F5;
+  --text2: #8B95A1;
+  --text3: #4B5563;
+  --up-bg: #2D1318;
+  --down-bg: #0F1E35;
+  --accent-light: #0D2340;
+}
+
+html.dark body { background: var(--bg); }
+html.dark #root { background: var(--surface); }
+
 body { background: var(--bg); color: var(--text1); min-height: 100dvh; }
 
 #root { max-width: 480px; margin: 0 auto; min-height: 100dvh; position: relative; background: var(--surface); }
 
-/* Scrollbar */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
-/* Utility */
 .up   { color: var(--up); }
 .down { color: var(--down); }
 .neutral { color: var(--neutral); }

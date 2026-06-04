@@ -5,17 +5,77 @@ import { SECTOR_KO } from '../data/users';
 import MiniChart from '../components/MiniChart';
 import { fmt } from '../components/PriceChange';
 
-// inject keyframes once
 if (typeof document !== 'undefined' && !document.getElementById('mkt-anim')) {
   const st = document.createElement('style');
   st.id = 'mkt-anim';
-  st.textContent = `@keyframes rowFlash { 0%{background:#FFF8E1} 100%{background:transparent} }`;
+  st.textContent = `@keyframes rowFlash{0%{background:#FFF8E1}100%{background:transparent}}`;
   document.head.appendChild(st);
 }
 
 const ALL_STOCKS = [...STOCK_DATA, ...LEVERAGED_DATA];
 const SORTS = ['등락률', '현재가', '이름'];
-const SECTORS = ['전체', ...new Set(ALL_STOCKS.map(s => SECTOR_KO[s.sector] ?? s.sector))].sort((a, b) => a === '전체' ? -1 : 0);
+const SECTOR_LIST = [...new Set(ALL_STOCKS.map(s => SECTOR_KO[s.sector] ?? s.sector))].sort();
+
+const PRICE_FACTOR = 0.85;
+
+function getSectorPerf(dayIndex, days = 5) {
+  const result = {};
+  const sectorStocks = {};
+  STOCK_DATA.forEach(s => {
+    const key = SECTOR_KO[s.sector] ?? s.sector;
+    if (!sectorStocks[key]) sectorStocks[key] = [];
+    sectorStocks[key].push(s);
+  });
+  const fromIdx = Math.max(0, dayIndex - days);
+  Object.entries(sectorStocks).forEach(([sec, stocks]) => {
+    let total = 0, count = 0;
+    stocks.forEach(s => {
+      const base = s.prices[fromIdx] ?? s.prices[0];
+      const cur = s.prices[dayIndex] ?? s.prices[s.prices.length - 1];
+      if (base > 0) { total += (cur - base) / base * 100; count++; }
+    });
+    result[sec] = count > 0 ? total / count : 0;
+  });
+  return result;
+}
+
+function SectorBar({ dayIndex }) {
+  const perf = useMemo(() => getSectorPerf(dayIndex, 5), [dayIndex]);
+  const sorted = Object.entries(perf).sort((a, b) => b[1] - a[1]);
+  const top3 = sorted.slice(0, 3);
+  const bot3 = sorted.slice(-3).reverse();
+
+  return (
+    <div style={{ padding: '10px 16px', borderBottom: '1px solid var(--border)', background: 'var(--bg)' }}>
+      <div style={{ fontSize: 11, color: 'var(--text3)', marginBottom: 8, fontWeight: 600 }}>📊 5일 섹터 강약 (상위/하위 3)</div>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ flex: 1 }}>
+          {top3.map(([sec, pct]) => (
+            <div key={sec} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+              <span style={{ fontSize: 11, color: 'var(--text2)', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sec}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <div style={{ width: Math.min(40, Math.abs(pct) * 3), height: 6, borderRadius: 3, background: 'var(--up)' }} />
+                <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--up)', minWidth: 36, textAlign: 'right' }}>+{pct.toFixed(1)}%</span>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div style={{ width: 1, background: 'var(--border)' }} />
+        <div style={{ flex: 1 }}>
+          {bot3.map(([sec, pct]) => (
+            <div key={sec} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+              <span style={{ fontSize: 11, color: 'var(--text2)', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sec}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <div style={{ width: Math.min(40, Math.abs(pct) * 3), height: 6, borderRadius: 3, background: 'var(--down)' }} />
+                <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--down)', minWidth: 36, textAlign: 'right' }}>{pct.toFixed(1)}%</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const s = {
   wrap: { padding: '16px 0' },
@@ -30,41 +90,39 @@ const s = {
     background: active ? 'var(--accent)' : 'var(--bg)',
     color: active ? '#fff' : 'var(--text2)', border: 'none', cursor: 'pointer',
   }),
-  sortRow: { display: 'flex', gap: 8, padding: '0 16px 12px', alignItems: 'center' },
+  sortRow: { display: 'flex', gap: 8, padding: '0 16px 10px', alignItems: 'center' },
   sortBtn: (active) => ({
     fontSize: 12, fontWeight: active ? 600 : 400,
     color: active ? 'var(--accent)' : 'var(--text3)', border: 'none', background: 'none', cursor: 'pointer',
   }),
   item: {
-    display: 'flex', alignItems: 'center', padding: '12px 16px',
-    cursor: 'pointer', borderBottom: '1px solid var(--border)', gap: 12,
+    display: 'flex', alignItems: 'center', padding: '11px 16px',
+    cursor: 'pointer', borderBottom: '1px solid var(--border)', gap: 10,
   },
   itemLeft: { flex: 1, minWidth: 0 },
-  name: { fontSize: 15, fontWeight: 600, marginBottom: 2 },
-  sector: { fontSize: 12, color: 'var(--text3)' },
+  name: { fontSize: 14, fontWeight: 600, marginBottom: 2 },
+  sector: { fontSize: 11, color: 'var(--text3)' },
   itemRight: { textAlign: 'right' },
-  price: { fontSize: 16, fontWeight: 700 },
+  price: { fontSize: 15, fontWeight: 700 },
   chg: (d) => ({
-    fontSize: 13, fontWeight: 600, marginTop: 2,
+    fontSize: 12, fontWeight: 600, marginTop: 2,
     color: d > 0 ? 'var(--up)' : d < 0 ? 'var(--down)' : 'var(--neutral)',
   }),
   summary: { padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', gap: 16 },
   summaryItem: { flex: 1 },
   summaryLabel: { fontSize: 11, color: 'var(--text3)', marginBottom: 2 },
   summaryValue: { fontSize: 15, fontWeight: 700 },
-  levBadge: {
-    display: 'inline-block', fontSize: 10, fontWeight: 700, padding: '1px 5px',
-    borderRadius: 4, background: '#FFF0D0', color: '#E67E00', marginLeft: 4,
-  },
-  liquidated: {
-    display: 'inline-block', fontSize: 10, fontWeight: 700, padding: '1px 5px',
-    borderRadius: 4, background: '#FFE0E0', color: 'var(--up)', marginLeft: 4,
-  },
+  star: (active) => ({
+    fontSize: 16, color: active ? '#F0A500' : 'var(--border)',
+    background: 'none', border: 'none', cursor: 'pointer', padding: '0 4px', flexShrink: 0,
+  }),
+  levBadge: { display: 'inline-block', fontSize: 10, fontWeight: 700, padding: '1px 4px', borderRadius: 4, background: '#FFF0D0', color: '#E67E00', marginLeft: 4 },
+  liquidated: { display: 'inline-block', fontSize: 10, fontWeight: 700, padding: '1px 4px', borderRadius: 4, background: '#FFE0E0', color: 'var(--up)', marginLeft: 4 },
 };
 
 export default function MarketPage() {
   const navigate = useNavigate();
-  const { getCurrentPrice, getPrevPrice, getStockPriceHistory, portfolio, currentDayIndex } = useGameStore();
+  const { getCurrentPrice, getPrevPrice, getStockPriceHistory, portfolio, currentDayIndex, favorites, toggleFavorite } = useGameStore();
   const [query, setQuery] = useState('');
   const [sector, setSector] = useState('전체');
   const [sort, setSort] = useState('등락률');
@@ -83,8 +141,7 @@ export default function MarketPage() {
       const price = getCurrentPrice(stock.code);
       const prevPrice = getPrevPrice(stock.code);
       const chg = prevPrice > 0 ? ((price - prevPrice) / prevPrice) * 100 : 0;
-      const isLiquidated = stock.isLeveraged && price === 0;
-      return { ...stock, price, prevPrice, chg, isLiquidated };
+      return { ...stock, price, chg, isLiquidated: stock.isLeveraged && price === 0 };
     });
   }, [currentDayIndex]);
 
@@ -95,20 +152,22 @@ export default function MarketPage() {
     if (sort === '등락률') arr = [...arr].sort((a, b) => b.chg - a.chg);
     else if (sort === '현재가') arr = [...arr].sort((a, b) => b.price - a.price);
     else arr = [...arr].sort((a, b) => a.name.localeCompare(b.name));
-    return arr;
-  }, [items, query, sector, sort]);
+    // Favorites on top (only when not sorted by name/price/sector filter)
+    const favs = arr.filter(s => favorites.includes(s.code));
+    const rest = arr.filter(s => !favorites.includes(s.code));
+    return [...favs, ...rest];
+  }, [items, query, sector, sort, favorites]);
 
   const totalValue = (() => {
     if (!portfolio) return 0;
     let v = portfolio.cash;
-    for (const [code, h] of Object.entries(portfolio.holdings || {})) {
-      v += getCurrentPrice(code) * h.quantity;
-    }
+    for (const [code, h] of Object.entries(portfolio.holdings || {})) v += getCurrentPrice(code) * h.quantity;
     return v;
   })();
 
-  const up = items.filter(s => s.chg > 0 && !s.isLeveraged).length;
-  const down = items.filter(s => s.chg < 0 && !s.isLeveraged).length;
+  const baseStocks = items.filter(s => !s.isLeveraged);
+  const up = baseStocks.filter(s => s.chg > 0).length;
+  const down = baseStocks.filter(s => s.chg < 0).length;
 
   return (
     <div style={s.wrap}>
@@ -131,17 +190,17 @@ export default function MarketPage() {
         </div>
       )}
 
+      {/* 5-day sector bar */}
+      <SectorBar dayIndex={currentDayIndex} />
+
       <div style={s.search}>
         <span style={{ fontSize: 16 }}>🔍</span>
-        <input
-          style={s.searchInput} placeholder="종목명 검색"
-          value={query} onChange={e => setQuery(e.target.value)}
-        />
+        <input style={s.searchInput} placeholder="종목명 검색" value={query} onChange={e => setQuery(e.target.value)} />
         {query && <button onClick={() => setQuery('')} style={{ color: 'var(--text3)', fontSize: 16 }}>✕</button>}
       </div>
 
       <div style={s.sectorRow}>
-        {SECTORS.map(sec => (
+        {['전체', ...SECTOR_LIST].map(sec => (
           <button key={sec} style={s.sectorChip(sector === sec)} onClick={() => setSector(sec)}>{sec}</button>
         ))}
       </div>
@@ -158,37 +217,29 @@ export default function MarketPage() {
         const history = getStockPriceHistory(stock.code);
         const isUp = stock.chg >= 0;
         const held = portfolio?.holdings?.[stock.code];
+        const isFav = favorites.includes(stock.code);
         return (
-          <div
-            key={stock.code}
-            style={{
-              ...s.item,
-              animation: `rowFlash 0.5s ease-out`,
-              animationPlayState: 'running',
-            }}
-            onClick={() => navigate(`/stock/${stock.code}`)}
-          >
-            <div style={s.itemLeft}>
+          <div key={stock.code} style={s.item}>
+            <button style={s.star(isFav)} onClick={e => { e.stopPropagation(); toggleFavorite(stock.code); }}>
+              {isFav ? '★' : '☆'}
+            </button>
+            <div style={{ ...s.itemLeft, cursor: 'pointer' }} onClick={() => navigate(`/stock/${stock.code}`)}>
               <div style={s.name}>
                 {stock.name}
                 {stock.isLeveraged && !stock.isLiquidated && <span style={s.levBadge}>2X</span>}
                 {stock.isLiquidated && <span style={s.liquidated}>청산</span>}
-                {held && <span style={{ marginLeft: 6, fontSize: 11, color: 'var(--accent)', fontWeight: 600 }}>보유</span>}
+                {held && <span style={{ marginLeft: 6, fontSize: 10, color: 'var(--accent)', fontWeight: 600 }}>보유</span>}
               </div>
               <div style={s.sector}>{SECTOR_KO[stock.sector] ?? stock.sector}</div>
             </div>
             <MiniChart prices={history} up={isUp} />
             <div
               key={`${stock.code}-${animKey}`}
-              style={{
-                ...s.itemRight,
-                animation: animKey > 0 ? 'rowFlash 0.5s ease-out' : 'none',
-              }}
+              style={{ ...s.itemRight, animation: animKey > 0 ? 'rowFlash 0.5s ease-out' : 'none', cursor: 'pointer' }}
+              onClick={() => navigate(`/stock/${stock.code}`)}
             >
               <div style={s.price}>{stock.isLiquidated ? '청산' : fmt(stock.price)}</div>
-              <div style={s.chg(stock.chg)}>
-                {stock.chg > 0 ? '+' : ''}{stock.chg.toFixed(2)}%
-              </div>
+              <div style={s.chg(stock.chg)}>{stock.chg > 0 ? '+' : ''}{stock.chg.toFixed(2)}%</div>
             </div>
           </div>
         );

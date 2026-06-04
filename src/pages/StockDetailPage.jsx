@@ -102,7 +102,8 @@ const CustomTooltip = ({ active, payload }) => {
 export default function StockDetailPage() {
   const { code } = useParams();
   const navigate = useNavigate();
-  const { getCurrentPrice, getStockPriceHistory, portfolio, currentDayIndex, user } = useGameStore();
+  const { getCurrentPrice, getStockPriceHistory, portfolio, currentDayIndex, user, favorites, toggleFavorite } = useGameStore();
+  const isFav = favorites.includes(code);
   const [period, setPeriod] = useState('전체');
   const [type, setType] = useState('buy');
   const [qty, setQty] = useState(1);
@@ -175,13 +176,19 @@ export default function StockDetailPage() {
     <div style={s.wrap}>
       <div style={s.header}>
         <button style={s.back} onClick={() => navigate(-1)}>←</button>
-        <div>
+        <div style={{ flex: 1 }}>
           <div style={s.name}>
             {stock.name}
             {stock.isLeveraged && <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: isLiquidated ? '#FFE0E0' : '#FFF0D0', color: isLiquidated ? 'var(--up)' : '#E67E00' }}>{isLiquidated ? '청산' : '2X'}</span>}
           </div>
           <div style={s.code}>{code} · {SECTOR_KO[stock.sector] ?? stock.sector}</div>
         </div>
+        <button
+          onClick={() => toggleFavorite(code)}
+          style={{ fontSize: 24, background: 'none', border: 'none', cursor: 'pointer', color: isFav ? '#F0A500' : 'var(--border)', padding: '0 4px' }}
+        >
+          {isFav ? '★' : '☆'}
+        </button>
       </div>
 
       <div style={s.priceWrap}>
