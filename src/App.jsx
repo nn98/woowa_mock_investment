@@ -32,9 +32,19 @@ function GameSync() {
     return unsub;
   }, []);
 
+  const portfolioLoadedRef = useRef(false);
   useEffect(() => {
     if (!user) return;
-    const unsub = subscribePortfolio(user.userId, setPortfolio);
+    portfolioLoadedRef.current = false;
+    const unsub = subscribePortfolio(user.userId, (p) => {
+      if (p !== null) {
+        portfolioLoadedRef.current = true;
+        setPortfolio(p);
+      } else if (portfolioLoadedRef.current) {
+        // Portfolio was deleted after being loaded → reset happened, log out
+        logout();
+      }
+    });
     return unsub;
   }, [user?.userId]);
 

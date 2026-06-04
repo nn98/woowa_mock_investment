@@ -96,38 +96,64 @@ const NAV_ITEMS = [
 function TopBar({ onBack, onLogout, game }) {
   const remaining = useCountdown(game);
   const urgent = remaining !== null && remaining <= 10;
-  const { darkMode, toggleDarkMode } = useGameStore();
+  const { darkMode, toggleDarkMode, currentDayIndex } = useGameStore();
+  const status = game?.status ?? 'waiting';
+  const STATUS_LABEL = { waiting: '대기중', running: '진행중', paused: '일시정지', finished: '종료' };
+  const statusColor = status === 'running' ? '#27AE60' : status === 'paused' ? '#F0A500' : 'var(--text3)';
+  const progress = game ? Math.round((currentDayIndex / (game.totalDays - 1)) * 100) : 0;
+
   return (
-    <div style={s.topBar}>
-      <span style={s.topLogo}>📈 우아한 모의투자</span>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        {remaining !== null && (
-          <div style={{
-            background: urgent ? 'var(--up)' : '#191F28',
-            borderRadius: 8, padding: '3px 10px',
-            display: 'flex', flexDirection: 'column', alignItems: 'flex-end',
-          }}>
-            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.6)', fontWeight: 500 }}>다음날까지</span>
-            <span style={{ fontSize: 14, fontWeight: 800, color: '#fff', fontVariantNumeric: 'tabular-nums' }}>
-              {remaining >= 60 ? `${Math.floor(remaining/60)}분 ${String(remaining%60).padStart(2,'0')}초` : `${remaining}초`}
-            </span>
-          </div>
-        )}
-        <button onClick={toggleDarkMode} style={{ fontSize: 18, background: 'none', border: 'none', cursor: 'pointer', padding: 2 }}>
-          {darkMode ? '☀️' : '🌙'}
-        </button>
-        {onLogout && (
-          <button onClick={onLogout} style={{
-            height: 32, padding: '0 12px', borderRadius: 8, border: '1.5px solid var(--up)',
-            fontSize: 13, fontWeight: 600, color: 'var(--up)', background: 'transparent', cursor: 'pointer',
-          }}>로그아웃</button>
-        )}
-        <button onClick={onBack} style={{
-          height: 32, padding: '0 12px', borderRadius: 8, border: '1px solid var(--border)',
-          fontSize: 13, fontWeight: 600, color: 'var(--text2)', background: 'var(--bg)', cursor: 'pointer',
-        }}>← 나가기</button>
+    <>
+      <div style={s.topBar}>
+        <span style={s.topLogo}>📈 우아한 모의투자</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {/* Same countdown/status as Layout */}
+          {remaining !== null ? (
+            <div style={{
+              background: urgent ? 'var(--up)' : '#191F28',
+              borderRadius: 8, padding: '4px 10px',
+              display: 'flex', flexDirection: 'column', alignItems: 'flex-end',
+            }}>
+              <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.6)', fontWeight: 500 }}>다음날까지</span>
+              <span style={{ fontSize: 14, fontWeight: 800, color: '#fff', fontVariantNumeric: 'tabular-nums', lineHeight: 1.2 }}>
+                {remaining >= 60 ? `${Math.floor(remaining/60)}분 ${String(remaining%60).padStart(2,'0')}초` : `${remaining}초`}
+              </span>
+            </div>
+          ) : (
+            <span style={{
+              fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 20,
+              background: `${statusColor}18`, color: statusColor,
+            }}>{STATUS_LABEL[status]}</span>
+          )}
+          {game && <span style={{ fontSize: 11, color: 'var(--text3)' }}>{progress}%</span>}
+
+          {/* Dark mode */}
+          <button onClick={toggleDarkMode} style={{ fontSize: 18, background: 'none', border: 'none', cursor: 'pointer', padding: 2 }}>
+            {darkMode ? '☀️' : '🌙'}
+          </button>
+
+          {/* Logout icon */}
+          {onLogout && (
+            <button onClick={onLogout} title="로그아웃" style={{
+              width: 32, height: 32, borderRadius: 8, border: '1px solid var(--border)',
+              fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'var(--bg)', cursor: 'pointer', color: 'var(--up)',
+            }}>↩</button>
+          )}
+
+          {/* Home icon */}
+          <button onClick={onBack} title="나가기" style={{
+            width: 32, height: 32, borderRadius: 8, border: '1px solid var(--border)',
+            fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'var(--bg)', cursor: 'pointer', color: 'var(--text2)',
+          }}>🏠</button>
+        </div>
       </div>
-    </div>
+      {/* Progress bar — same as Layout */}
+      <div style={{ height: 2, background: 'var(--border)', margin: '0 -20px' }}>
+        <div style={{ height: '100%', width: `${progress}%`, background: 'var(--accent)', transition: 'width 1s linear' }} />
+      </div>
+    </>
   );
 }
 
